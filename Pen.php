@@ -8,7 +8,9 @@
 
 namespace Zemfr;
 
+use Zemfr\Exceptions\ColorNotFoundException;
 use Zemfr\Exceptions\PenEnabledException;
+use Zemfr\Interfaces\FeatherInterface;
 
 
 /**
@@ -17,6 +19,17 @@ use Zemfr\Exceptions\PenEnabledException;
  */
 class Pen extends PenAbstract
 {
+
+    /**
+     * @var FeatherInterface[]
+     */
+    private $feather = [];
+
+    /**
+     * @var FeatherInterface
+     */
+    private $currentFeather;
+
     /**
      * @var
      */
@@ -48,6 +61,38 @@ class Pen extends PenAbstract
             throw new PenEnabledException();
         }
         parent::write($text);
+    }
+
+    /**
+     * @param FeatherInterface $feather
+     * @return mixed|void
+     */
+    public function addFeather(FeatherInterface $feather)
+    {
+        array_push($this->feather, $feather);
+    }
+
+    /**
+     * @return array
+     */
+    public function getFeather()
+    {
+        return $this->currentFeather;
+    }
+
+    /**
+     * @param string $color
+     * @throws Exceptions\ColorNotFoundException
+     */
+    public function setColor($color)
+    {
+        foreach ($this->feather as $feather) {
+            if ($color == $feather->getTextColor()) {
+                $this->currentFeather = $feather;
+                return;
+            }
+        }
+        throw new ColorNotFoundException;
     }
 
 }
